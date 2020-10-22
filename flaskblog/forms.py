@@ -39,6 +39,18 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
+    def validate_phone(self, phone):
+        user = User.query.filter_by(phone=phone.data).first()
+        if user:
+            raise ValidationError('That phone number is taken. Please choose a different one.')
+    def validate_rank(self, rank):
+        user = User.query.filter_by(rank=rank.data).first()
+        if user:
+            raise ValidationError('That rank is taken. Please choose a different one.')
+    def validate_roll(self, roll):
+        user = User.query.filter_by(roll=roll.data).first()
+        if user:
+            raise ValidationError('That roll number is taken. Please choose a different one.')
 
 
 class LoginForm(FlaskForm):
@@ -66,11 +78,17 @@ class UpdateAccountForm(FlaskForm):
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update')
 
-    def validate_firstname(self, firstname):
-        if firstname.data != current_user.firstname:
-            user = User.query.filter_by(firstname=firstname.data).first()
+    # def validate_firstname(self, firstname):
+    #     if firstname.data != current_user.firstname:
+    #         user = User.query.filter_by(firstname=firstname.data).first()
+    #         if user:
+    #             raise ValidationError('That firstname is taken. Please choose a different one.')
+
+    def validate_phone(self, phone):
+        if phone.data != current_user.phone:
+            user = User.query.filter_by(phone=phone.data).first()
             if user:
-                raise ValidationError('That firstname is taken. Please choose a different one.')
+                raise ValidationError('That phone number is taken. Please choose a different one.')
 
     def validate_email(self, email):
         if email.data != current_user.email:
