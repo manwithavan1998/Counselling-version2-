@@ -126,11 +126,18 @@ class PostForm(FlaskForm):
     #     title4 = SelectField('Choice 4', validators=[DataRequired()],choices = list3)
     #     title5 = SelectField('Choice 5', validators=[DataRequired()],choices = list4)
     # else:
-    title1 = SelectField('Choice 1', validators=[DataRequired()],choices = list)
-    title2 = SelectField('Choice 2', validators=[DataRequired()],choices = list)
+    # title1 = SelectField('Choice 1', validators=[DataRequired()],choices = list)
+    # title2 = SelectField('Choice 2', validators=[DataRequired()],choices = list)
 
-    title3 = SelectField('Choice 3', validators=[DataRequired()],choices = list)
-    title4 = SelectField('Choice 4', validators=[DataRequired()],choices = list)
-    title5 = SelectField('Choice 5', validators=[DataRequired()],choices = list)
-        # content = TextAreaField('Content', validators=[DataRequired()])
-    submit = SubmitField('Post')
+    # title3 = SelectField('Choice 3', validators=[DataRequired()],choices = list)
+    # title4 = SelectField('Choice 4', validators=[DataRequired()],choices = list)
+    # title5 = SelectField('Choice 5', validators=[DataRequired()],choices = list)
+    #     # content = TextAreaField('Content', validators=[DataRequired()])
+    # submit = SubmitField('Post')
+    list1 = []
+    for i in range(0,10):
+        list1.append(i+1)
+    title1 = SelectField('Preference Rank', validators=[DataRequired()],choices = list1)
+    
+    title2 = SelectField('Choices', validators=[DataRequired()],choices = list)
+    submit = SubmitField('Add')

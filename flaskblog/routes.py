@@ -136,28 +136,31 @@ def account():
 def new_post():
     form = PostForm()
     
-    
+
     if form.validate_on_submit():
 
-        course_id1 = []
-        course_id1.append(form.title1.data.split(':'))
-        course_id1.append(form.title2.data.split(':'))
-        course_id1.append(form.title3.data.split(':'))
-        course_id1.append(form.title4.data.split(':'))
-        course_id1.append(form.title5.data.split(':'))
-
+        
+        # course_id1.append(form.title1.data.split(':'))
+        # course_id1.append(form.title2.data.split(':'))
+        # course_id1.append(form.title3.data.split(':'))
+        # course_id1.append(form.title4.data.split(':'))
+        # course_id1.append(form.title5.data.split(':'))
+        pref_rank = form.title1.data
+        TEMP = form.title2.data.split(':')
+        Course_id = TEMP[0]
         app.logger.info('course_id1')
         app.logger.info(form.title1.data) 
-        
-        for i in range(0,5):
-            pref = User_preference(user_id = current_user.id,course_id = course_id1[i][0],preference_rank = i+1)
-            db.session.add(pref)
-            db.session.commit()
+        User_preference.query.filter_by(user_id = current_user.id , preference_rank = pref_rank).delete()
+        db.session.commit()
+
+        pref = User_preference(user_id = current_user.id,course_id = Course_id,preference_rank = pref_rank)
+        db.session.add(pref)
+        db.session.commit()
         # post = Post(title=form.title1.data, content=form.content.data, author=current_user)
         # db.session.add(post)
         # db.session.commit()
         flash('Your choices has been posted!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('new_post'))
     # elif request.method == 'GET':
     #     exists = db.session.query(
     #             db.session.query(User_preference).filter_by(user_id = current_user.id).exists()
@@ -189,9 +192,32 @@ def new_post():
         # form.title3.choices = list
         # form.title4.choices = list
         # form.title5.choices = list
-        
+    list = []
+    list = User_preference.query.filter_by(user_id = current_user.id).all()
+    join_query = db.session.query(College,Course,Branch)\
+                    .join(Course,Course.college_id == College.college_id)\
+                    .join(Branch,Branch.branch_id == Course.branch_id)
+    new_list = []
+    for x in list:
+        temp_list = []
+        temp_list.append(x.preference_rank)
+        for query in join_query.all():
+            if query[1].course_id == x.course_id:
+                temp_list.append(query[0].college_name)
+                temp_list.append(query[2].branch_name)
+
+            # for item in query:
+            #     if hasattr(item,'college_name') and x.course_id == 3:
+            #         temp_list.append(item.college_name)
+            # for item in query:
+            #     if hasattr(item,'branch_name') and x.course_id == 3:
+            #         temp_list.append(item.branch_name)
+
+        new_list.append(temp_list)
+
+    new_list.sort()
     return render_template('choices.html', title='New Post',
-                           form=form, legend='Choice Filling')
+                           form=form, legend='Choice Filling',pref = new_list)
 
 
 # @app.route("/post/<int:post_id>")
