@@ -10,10 +10,10 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(20), unique=True, nullable=False)
-    lastname = db.Column(db.String(20), unique=True, nullable=False)
-    phone = db.Column(db.String(10), unique=True, nullable=False)
-    roll = db.Column(db.String(10), unique=True, nullable=False)
+    firstname = db.Column(db.String(20), nullable=False)
+    lastname = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=False)
+    roll = db.Column(db.String(20), unique=True, nullable=False)
     rank = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
@@ -37,7 +37,7 @@ class Post(db.Model):
 
 class College(db.Model):
     college_id = db.Column(db.Integer,primary_key = True)
-    college_name = db.Column(db.String(100),nullable = False)
+    college_name = db.Column(db.String(100),nullable = False,unique = True)
 
     def __repr__(self):
         return f"Post('{self.college_id}', '{self.college_name}')"
@@ -47,7 +47,7 @@ class College(db.Model):
 class Course(db.Model):
     course_id = db.Column(db.Integer,primary_key = True)
     college_id = db.Column(db.Integer,db.ForeignKey('college.college_id'))
-    no_of_seat = db.Column(db.Integer,nullable=False)
+    no_of_seat = db.Column(db.Integer,nullable=False,)
     branch_id = db.Column(db.Integer,db.ForeignKey('branch.branch_id'),nullable=False)
     # colleges = db.relationship('College', backref='college', lazy=True)
 
@@ -57,7 +57,7 @@ class Course(db.Model):
 
 class Branch(db.Model):
     branch_id = db.Column(db.Integer,primary_key = True)
-    branch_name = db.Column(db.String(100),nullable = False)
+    branch_name = db.Column(db.String(100),unique = True,nullable = False)
 
     def __repr__(self):
         return f"Post('{self.branch_id}', '{self.branch_name}')"
@@ -74,3 +74,14 @@ class User_preference(db.Model):
 
     def __repr__(self):
         return f"Post('{self.id}','{self.user_id}', '{self.course_id}', '{self.preference_rank}')"
+
+
+class Admin(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    firstname = db.Column(db.String(20), nullable=False)
+    lastname = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    password = db.Column(db.String(60), nullable=False)
