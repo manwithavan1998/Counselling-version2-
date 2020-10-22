@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- {% for post in posts %}
+        <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ post.author.username }}</a>
+              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            </div>
+            <h2><a class="article-title" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+          </div>
+        </article>
+    {% endfor %} -->
+<section class="contentsection mt-1" id="skipcontent">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+
+
+
+        <div class="mb-4 pagecontentpara">
+          <h3 class="pageheading" style="color: purple">Introduction</h3>
+
+          <p>The Joint Seat Allocation Authority (JoSAA) 2020 has been set up by the Ministry of Education [erstwhile
+            Ministry of Human Resources Development (MHRD)] to manage and regulate the joint seat allocation for
+            admissions to 110 institutes for the academic year 2020-21. This includes 23 IITs, 31 NITs, IIEST Shibpur,
+            26 IIITs and 29 Other-Government Funded Technical Institutes (Other-GFTIs). Admission to all the academic
+            programs offered by these Institutes will be made through a single platform.</p>
+
+          <table border="1" cellspacing="0" style="width:90%">
+            <tbody>
+              <tr>
+                <th>Qualifying Examination</th>
+                <th>Admitting Institutes</th>
+              </tr>
+              <tr>
+                <td>JEE (Advanced) 2020</td>
+                <td>IITs</td>
+              </tr>
+              <tr>
+                <td>JEE (Main) 2020 B.E./B.Tech.</td>
+                <td rowspan="3" style="vertical-align:top">
+                  <p>NITs, IIEST, IIITs (Triple-I-Ts) and Other-GFTIs</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="vertical-align:top">JEE (Main) 2020 B.Arch.</td>
+              </tr>
+              <tr>
+                <td>JEE (Main) 2020 B.Planning</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p> </p>
+
+          <table border="1" cellspacing="0" style="width:90%">
+            <tbody>
+              <tr>
+                <th>State of Eligibility Document</th>
+              </tr>
+              <tr>
+                <td>Proof of Place of Passing Class XII, upload any one document whichever is applicable : Admit
+                  Card/Class XII MarkSheet/Passport (in case Class XII passed from Outside India)</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <div class="mt-2">
+
+          <nav id="sidebar">
+            <ul class="list-unstyled components">
+              <a class="btn btn-primary btn-block btn-lg" href="#"
+                target='_self'> Seat Allotment Result Comming Soon <img
+                  src='https://josaa.nic.in/webinfo/Content/img/newicon.gif' alt='new' /> </a>
+
+            </ul>
+
+          </nav>
+        </div>
+
+
+
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
