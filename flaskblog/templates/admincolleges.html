@@ -1,0 +1,39 @@
+{% extends "adminlayout.html" %}
+{% block content %}
+    <h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;font-size: 70px">Seat Matrix</h1>
+    <table class="m-5" style="width: 700px;font-size: 20px" >
+        <tr class ="" style="color: black;border: 5px solid #929292;background-color: #FFEE88 ">
+                <th >
+                    College Name
+                </th>
+                <th>
+                    Branch name
+                </th>
+                <th>
+                    Total Seat 
+                </th>
+            </tr>
+    {% for query in join_query %}
+        <div style="margin:0px 0px 10px">
+            <a href="#" class="">
+                <tr style="border: 1.5px solid #929292">
+                    <th>
+                        {{query[0]}} 
+                    </th>
+                    <th>
+                        {{query[2]}}
+                    </th>
+                    <th>
+                         {{query[1]}}
+                    </th>
+                </tr>
+              
+               
+            </a>
+        </div>
+    {% endfor %}
+    </table>
+
+
+
+{% endblock content %}

@@ -3,16 +3,27 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
-from flaskblog.models import User, Post, College, Course, Branch, User_preference
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AdminLoginForm,CollegeForm,BranchForm,CourseForm
+from flaskblog.models import User, Post, College, Course, Branch, User_preference, Admin
 from flask_login import login_user, current_user, logout_user, login_required
 import logging
-
+from functools import wraps
+def adminlogin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        
+        if current_user.is_authenticated is False or current_user.id != 1:
+            flash('Please Log In As Admin','danger')
+            return redirect(url_for('Adminlogin'))
+        return f(*args, **kwargs)
+    return decorated_function
 @app.route("/")
 @app.route("/home")
 def home():
-    posts = Post.query.all()
-    return render_template('home.html', posts=posts)
+    if current_user.is_authenticated:
+        print(current_user.firstname)
+        print(" gsdgagava is here")
+    return render_template('home.html')
 
 
 @app.route("/about")
@@ -43,13 +54,98 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.id != 1:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@app.route("/Adminlogin", methods=['GET', 'POST'])
+def Adminlogin():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = AdminLoginForm()
+    if form.validate_on_submit():
+        admin = User.query.filter_by(email=form.email1.data).first()
+        if admin and bcrypt.check_password_hash(admin.password, form.password1.data) and admin.id == 1:
+            login_user(admin, remember=form.remember1.data)
+            next_page = request.args.get('next')
+            app.logger.info(current_user.firstname)
+            return redirect(next_page) if next_page else redirect(url_for('adminhome'))
+        else:
+            flash('Login Unsuccessful. Please check email and password', 'danger')
+    return render_template('adminlogin.html', title='Admin Login', form=form)
+
+@app.route("/adminhome", methods=['GET', 'POST'])
+@adminlogin_required
+def adminhome():    
+    form1 = CollegeForm()
+    form2 = BranchForm()
+    form = CourseForm()
+    if form.validate_on_submit():
+        college = College.query.filter_by(college_name = form.collegename.data).first()
+        branch = Branch.query.filter_by(branch_name = form.branchname.data).first()
+        course = Course(college_id = college.college_id,branch_id = branch.branch_id,no_of_seat = form.seats.data)
+        db.session.add(course)
+        db.session.commit()
+        flash('New Course Added successfully', 'success')
+        return redirect(url_for('adminhome'))
+    if form1.validate_on_submit():
+        college1 = College(college_name = form1.collegename.data)
+        db.session.add(college1)
+        db.session.commit()
+        flash('New College Added successfully', 'success')
+        return redirect(url_for('adminhome'))
+    if form2.validate_on_submit():
+        branch = Branch(branch_name = form2.branchname.data)
+        db.session.add(branch)
+        db.session.commit()
+        flash('New Branch Added successfully', 'success')
+        return redirect(url_for('adminhome'))
+    return render_template('adminhome.html',form1 = form1, form2 = form2,form = form)
+    
+        
+
+@app.route("/addcollege", methods=['GET', 'POST'])
+@adminlogin_required
+def addcollege():
+    form = CollegeForm()
+    if form.validate_on_submit():
+        college1 = College(college_name = form.collegename.data)
+        db.session.add(college1)
+        db.session.commit()
+        flash('New College Added successfully', 'success')
+        return redirect(url_for('addcollege'))
+    return render_template('newcollege.html',form = form)
+
+@app.route("/addbranch", methods=['GET', 'POST'])
+@adminlogin_required
+def addbranch():
+    form = BranchForm()
+    if form.validate_on_submit():
+        branch = Branch(branch_name = form.branchname.data)
+        db.session.add(branch)
+        db.session.commit()
+        flash('New Branch Added successfully', 'success')
+        return redirect(url_for('addcollege'))
+    return render_template('newbranch.html',form = form)
+
+@app.route("/addcourse", methods=['GET', 'POST'])
+@adminlogin_required
+def addcourse():
+    form = CourseForm()
+    if form.validate_on_submit():
+        college = College.query.filter_by(college_name = form.collegename.data).first()
+        branch = Branch.query.filter_by(branch_name = form.branchname.data).first()
+        course = Course(college_id = college.college_id,branch_id = branch.branch_id,no_of_seat = form.seats.data)
+        db.session.add(course)
+        db.session.commit()
+        flash('New Course Added successfully', 'success')
+        return redirect(url_for('addcourse'))
+    return render_template('newcourse.html',form = form)
+
 
 
 @app.route("/logout")
@@ -83,6 +179,31 @@ def seat_matrix():
 
     return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
 
+@app.route("/adminseatmatrix")
+@adminlogin_required
+def adminseat_matrix():
+    colleges = College.query.all()
+    courses = Course.query.all()
+    branches = Branch.query.all()
+    join_query = db.session.query(College,Course,Branch)\
+                    .join(Course,Course.college_id == College.college_id)\
+                    .join(Branch,Branch.branch_id == Course.branch_id)
+    list = []
+    for query in join_query.all():
+        temp = []
+        for item in query:
+            if hasattr(item,'college_name'):
+                temp.append(item.college_name)
+            if hasattr(item,'branch_name'):
+                temp.append(item.branch_name)
+            if hasattr(item,'no_of_seat'):
+                temp.append(item.no_of_seat)
+        list.append(temp)
+        
+        
+
+
+    return render_template('admincolleges.html', title='collegelist' , courses = courses,join_query = list)
 
 
 def save_picture(form_picture):

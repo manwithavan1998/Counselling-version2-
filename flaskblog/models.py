@@ -52,7 +52,7 @@ class Course(db.Model):
     # colleges = db.relationship('College', backref='college', lazy=True)
 
     def __repr__(self):
-        return f"Post('{self.college_id}', '{self.course_id}')"
+        return f"Post('{self.college_id}', '{self.course_id}, '{self.branch_id}', '{self.no_of_seat}')"
 
 
 class Branch(db.Model):
@@ -76,7 +76,7 @@ class User_preference(db.Model):
         return f"Post('{self.id}','{self.user_id}', '{self.course_id}', '{self.preference_rank}')"
 
 
-class Admin(db.Model):
+class Admin(db.Model,UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
@@ -85,3 +85,5 @@ class Admin(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
+    def __repr__(self):
+        return f"User('{self.id}','{self.firstname}','{self.lastname}', '{self.email}', '{self.phone}')"

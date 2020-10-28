@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flaskblog.models import User, College, Course, Branch, User_preference
+from flaskblog.models import User, College, Course, Branch, User_preference, Admin
 from flaskblog import db, app,login_manager
 
 @login_manager.user_loader
@@ -60,6 +60,12 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
+class AdminLoginForm(FlaskForm):
+    email1 = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    password1 = PasswordField('Password', validators=[DataRequired()])
+    remember1 = BooleanField('Remember Me')
+    submit1 = SubmitField('Login')
 
 class UpdateAccountForm(FlaskForm):
     firstname = StringField('First name',
@@ -96,6 +102,49 @@ class UpdateAccountForm(FlaskForm):
             if user:
                 raise ValidationError('That email is taken. Please choose a different one.')
 
+class CollegeForm(FlaskForm):
+    collegename = StringField('College Name',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    submit = SubmitField('Add')
+
+
+    def validate_collegename(self, collegename):
+        college = College.query.filter_by(college_name=collegename.data).first()
+        if college:
+            raise ValidationError('That College is Already Present In The Database. Please choose a different one.')
+
+
+class BranchForm(FlaskForm):
+    branchname = StringField('Branch Name',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    submit = SubmitField('Add')
+
+    def validate_branchname(self, branchname):
+        branch = Branch.query.filter_by(branch_name=branchname.data).first()
+        if branch :
+            raise ValidationError('That Branch is Already Present In The Database. Please choose a different one.')
+
+
+class CourseForm(FlaskForm):
+    collegename = StringField('College Name',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    branchname = StringField('Branch Name',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+
+    seats = StringField('Number of Seats',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    submit = SubmitField('Add')
+
+    def validate_collegename(self, collegename):
+        college = College.query.filter_by(college_name=collegename.data).first()
+        if college is None:
+            raise ValidationError('That College is Not Present In The Database. Please choose a different one.')
+    def validate_branchname(self, branchname):
+        branch = Branch.query.filter_by(branch_name=branchname.data).first()
+        if branch is None:
+            raise ValidationError('That Branch is Not Present In The Database. Please choose a different one.')
+
+
 
 class PostForm(FlaskForm):
     join_query = db.session.query(College,Course,Branch)\
@@ -118,40 +167,7 @@ class PostForm(FlaskForm):
                 s = s + item.branch_name
 
         list.append(s)
-    # app.logger.info('hello')
-    # app.logger.info(current_user)
-    # exists = db.session.query(
-    #             db.session.query(User_preference).filter_by(user_id = (current_user.id)).exists()
-    #         ).scalar()
-    # if(exists == False):
-    #     app.logger.info('hello')
-    # choices = User_preference.query.filter_by(user_id = (current_user.id))
-    # app.logger.info(choices[0].course_id)
-    # app.logger.info(choices[1].course_id)
-    # if exists :
-    #     list[0] = choices[0].course_id
-    #     list1 = list[:]
-    #     list1[0] = choices[1].course_id    
-    #     list2 = list[:]
-    #     list2[0] = choices[2].course_id 
-    #     list3 = list[:]
-    #     list3[0] = choices[3].course_id
-    #     list4 = list[:]
-    #     list4[0] = choices[4].course_id
-    #     title1 = SelectField('Choice 1', validators=[DataRequired()],choices = list)
-    #     title2 = SelectField('Choice 2', validators=[DataRequired()],choices = list1)
-    #     title3 = SelectField('Choice 3', validators=[DataRequired()],choices = list2)
-    #     title4 = SelectField('Choice 4', validators=[DataRequired()],choices = list3)
-    #     title5 = SelectField('Choice 5', validators=[DataRequired()],choices = list4)
-    # else:
-    # title1 = SelectField('Choice 1', validators=[DataRequired()],choices = list)
-    # title2 = SelectField('Choice 2', validators=[DataRequired()],choices = list)
 
-    # title3 = SelectField('Choice 3', validators=[DataRequired()],choices = list)
-    # title4 = SelectField('Choice 4', validators=[DataRequired()],choices = list)
-    # title5 = SelectField('Choice 5', validators=[DataRequired()],choices = list)
-    #     # content = TextAreaField('Content', validators=[DataRequired()])
-    # submit = SubmitField('Post')
     list1 = []
     for i in range(0,10):
         list1.append(i+1)
