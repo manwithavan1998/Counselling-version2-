@@ -25,11 +25,9 @@ def home():
         print(" gsdgagava is here")
     return render_template('home.html')
 
-
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
-
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -45,7 +43,6 @@ def register():
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -158,12 +155,10 @@ def addcourse():
     return render_template('newcourse.html',form = form)
 
 
-
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for('home'))
-
 
 @app.route("/seat matrix")
 def seat_matrix():
@@ -184,9 +179,6 @@ def seat_matrix():
             if hasattr(item,'no_of_seat'):
                 temp.append(item.no_of_seat)
         list.append(temp)
-        
-        
-
 
     return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
 
@@ -212,10 +204,31 @@ def adminseat_matrix():
         list.append(temp)
         
         
+    return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
 
-
+@app.route("/adminseatmatrix")
+@adminlogin_required
+def adminseat_matrix():
+    colleges = College.query.all()
+    courses = Course.query.all()
+    branches = Branch.query.all()
+    join_query = db.session.query(College,Course,Branch)\
+                    .join(Course,Course.college_id == College.college_id)\
+                    .join(Branch,Branch.branch_id == Course.branch_id)
+    list = []
+    for query in join_query.all():
+        temp = []
+        for item in query:
+            if hasattr(item,'college_name'):
+                temp.append(item.college_name)
+            if hasattr(item,'branch_name'):
+                temp.append(item.branch_name)
+            if hasattr(item,'no_of_seat'):
+                temp.append(item.no_of_seat)
+        list.append(temp)
+        
+        
     return render_template('admincolleges.html', title='collegelist' , courses = courses,join_query = list)
-
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
@@ -255,22 +268,18 @@ def account():
         form.email.data = current_user.email
         form.phone.data = current_user.phone
         form.roll.data = current_user.roll
-        form.rank.data = current_user.rank
-        
+        form.rank.data = current_user.rank   
         
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
-
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
-    
 
     if form.validate_on_submit():
-
         
         # course_id1.append(form.title1.data.split(':'))
         # course_id1.append(form.title2.data.split(':'))
@@ -332,6 +341,7 @@ def new_post():
     new_list = []
     for x in list:
         temp_list = []
+        temp_list.append(x.id)
         temp_list.append(x.preference_rank)
         for query in join_query.all():
             if query[1].course_id == x.course_id:
@@ -381,12 +391,9 @@ def new_post():
 @app.route("/post/<int:post_id>/delete", methods=['POST'])
 @login_required
 def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
+    post = User_preference.query.get_or_404(post_id)
     db.session.delete(post)
     db.session.commit()
     flash('Your post has been deleted!', 'success')
-    return redirect(url_for('home'))
-
+    return redirect(url_for('new_post'))
 
