@@ -137,6 +137,17 @@ def addbranch():
 def addcourse():
     form = CourseForm()
     if form.validate_on_submit():
+
+        college = College.query.filter_by(college_name = form.collegename.data).first()
+        if college is None:
+            college = College(college_name = form.collegename.data)
+            db.session.add(college)
+            db.session.commit()
+        branch = Branch.query.filter_by(branch_name = form.branchname.data).first()
+        if branch is None:
+            branch = Branch(branch_name = form.branchname.data)
+            db.session.add(branch)
+            db.session.commit()
         college = College.query.filter_by(college_name = form.collegename.data).first()
         branch = Branch.query.filter_by(branch_name = form.branchname.data).first()
         course = Course(college_id = college.college_id,branch_id = branch.branch_id,no_of_seat = form.seats.data)

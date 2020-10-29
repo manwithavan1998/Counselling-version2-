@@ -135,14 +135,14 @@ class CourseForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=100)])
     submit = SubmitField('Add')
 
-    def validate_collegename(self, collegename):
-        college = College.query.filter_by(college_name=collegename.data).first()
-        if college is None:
-            raise ValidationError('That College is Not Present In The Database. Please choose a different one.')
-    def validate_branchname(self, branchname):
-        branch = Branch.query.filter_by(branch_name=branchname.data).first()
-        if branch is None:
-            raise ValidationError('That Branch is Not Present In The Database. Please choose a different one.')
+    # def validate_collegename(self, collegename):
+    #     college = College.query.filter_by(college_name=collegename.data).first()
+    #     if college is None:
+    #         raise ValidationError('That College is Not Present In The Database. Please choose a different one.')
+    # def validate_branchname(self, branchname):
+    #     branch = Branch.query.filter_by(branch_name=branchname.data).first()
+    #     if branch is None:
+    #         raise ValidationError('That Branch is Not Present In The Database. Please choose a different one.')
 
 
 
