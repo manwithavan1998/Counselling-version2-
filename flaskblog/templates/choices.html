@@ -59,20 +59,41 @@
                 <a href="#" class="">
                     <tr style="border: 1.5px solid #929292">
                         <th>
-                            {{query[0]}}  
-                        </th>
-                        <th>
                             {{query[1]}}  
                         </th>
                         <th>
                             {{query[2]}}  
                         </th>
+                        <th>
+                            {{query[3]}}  
+                        </th>
+                        <th>
+                            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                            <!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete choice?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('delete_post', post_id=query[0]) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+                        </th>
                     </tr>
-                  
-                   
                 </a>
             </div>
     {% endfor %}
     </table>
 </div>
+
 {% endblock content %}

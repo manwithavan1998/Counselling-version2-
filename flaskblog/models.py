@@ -7,7 +7,6 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
@@ -19,10 +18,10 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
+    #role = db.Column(db.Integer, nullable=False, default=1)
 
     def __repr__(self):
         return f"User('{self.id}','{self.firstname}','{self.lastname}', '{self.email}', '{self.image_file}')"
-
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -34,15 +33,12 @@ class Post(db.Model):
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
 
-
 class College(db.Model):
     college_id = db.Column(db.Integer,primary_key = True)
     college_name = db.Column(db.String(100),nullable = False,unique = True)
 
     def __repr__(self):
         return f"Post('{self.college_id}', '{self.college_name}')"
-
-
 
 class Course(db.Model):
     course_id = db.Column(db.Integer,primary_key = True)
@@ -54,16 +50,12 @@ class Course(db.Model):
     def __repr__(self):
         return f"Post('{self.college_id}', '{self.course_id}, '{self.branch_id}', '{self.no_of_seat}')"
 
-
 class Branch(db.Model):
     branch_id = db.Column(db.Integer,primary_key = True)
     branch_name = db.Column(db.String(100),unique = True,nullable = False)
 
     def __repr__(self):
         return f"Post('{self.branch_id}', '{self.branch_name}')"
-
-
-
 
 class User_preference(db.Model):
     
