@@ -20,9 +20,6 @@ def adminlogin_required(f):
 @app.route("/")
 @app.route("/home")
 def home():
-    if current_user.is_authenticated:
-        print(current_user.firstname)
-        print(" gsdgagava is here")
     return render_template('home.html')
 
 @app.route("/about")
@@ -179,8 +176,9 @@ def seat_matrix():
             if hasattr(item,'no_of_seat'):
                 temp.append(item.no_of_seat)
         list.append(temp)
-
+    list.sort()
     return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
+
 
 @app.route("/adminseatmatrix")
 @adminlogin_required
@@ -202,31 +200,8 @@ def adminseat_matrix():
             if hasattr(item,'no_of_seat'):
                 temp.append(item.no_of_seat)
         list.append(temp)
-        
-        
-    return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
-
-@app.route("/adminseatmatrix")
-@adminlogin_required
-def adminseat_matrix():
-    colleges = College.query.all()
-    courses = Course.query.all()
-    branches = Branch.query.all()
-    join_query = db.session.query(College,Course,Branch)\
-                    .join(Course,Course.college_id == College.college_id)\
-                    .join(Branch,Branch.branch_id == Course.branch_id)
-    list = []
-    for query in join_query.all():
-        temp = []
-        for item in query:
-            if hasattr(item,'college_name'):
-                temp.append(item.college_name)
-            if hasattr(item,'branch_name'):
-                temp.append(item.branch_name)
-            if hasattr(item,'no_of_seat'):
-                temp.append(item.no_of_seat)
-        list.append(temp)
-        
+    
+    list.sort() 
         
     return render_template('admincolleges.html', title='collegelist' , courses = courses,join_query = list)
 
@@ -357,7 +332,8 @@ def new_post():
 
         new_list.append(temp_list)
 
-    new_list.sort()
+    new_list.sort(key = lambda new_list: new_list[1])
+    app.logger.info(new_list)
     return render_template('choices.html', title='New Post',
                            form=form, legend='Choice Filling',pref = new_list)
 
@@ -391,6 +367,8 @@ def new_post():
 @app.route("/post/<int:post_id>/delete", methods=['POST'])
 @login_required
 def delete_post(post_id):
+    app.logger.info("post_id = ")
+    app.logger.info(post_id)
     post = User_preference.query.get_or_404(post_id)
     db.session.delete(post)
     db.session.commit()
