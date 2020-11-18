@@ -79,3 +79,11 @@ class Admin(db.Model,UserMixin):
     password = db.Column(db.String(60), nullable=False)
     def __repr__(self):
         return f"User('{self.id}','{self.firstname}','{self.lastname}', '{self.email}', '{self.phone}')"
+
+
+class AllocatedSeat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'))
+    def __repr__(self):
+        return f"Seat('{self.id}','{self.user_id}','{self.course_id}')"

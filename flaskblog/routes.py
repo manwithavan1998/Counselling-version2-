@@ -3,11 +3,14 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AdminLoginForm,CollegeForm,BranchForm,CourseForm
-from flaskblog.models import User, Post, College, Course, Branch, User_preference, Admin
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AdminLoginForm,CollegeForm,BranchForm,CourseForm,DeclareResultForm
+from flaskblog.models import User, Post, College, Course, Branch, User_preference, Admin, AllocatedSeat
 from flask_login import login_user, current_user, logout_user, login_required
 import logging
 from functools import wraps
+from datetime import date
+result_declared = False
+
 def adminlogin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -78,6 +81,9 @@ def adminhome():
     form1 = CollegeForm()
     form2 = BranchForm()
     form = CourseForm()
+    form3 = DeclareResultForm()
+    if form3.validate_on_submit():
+        return redirect(url_for('DeclareResult'))
     if form.validate_on_submit():
         college = College.query.filter_by(college_name = form.collegename.data).first()
         branch = Branch.query.filter_by(branch_name = form.branchname.data).first()
@@ -98,13 +104,14 @@ def adminhome():
         db.session.commit()
         flash('New Branch Added successfully', 'success')
         return redirect(url_for('adminhome'))
-    return render_template('adminhome.html',form1 = form1, form2 = form2,form = form)
+    return render_template('adminhome.html',form1 = form1, form2 = form2,form = form,form3 = form3)
     
-        
+       
 
 @app.route("/addcollege", methods=['GET', 'POST'])
 @adminlogin_required
 def addcollege():
+
     form = CollegeForm()
     if form.validate_on_submit():
         college1 = College(college_name = form.collegename.data)
@@ -244,7 +251,8 @@ def account():
         form.phone.data = current_user.phone
         form.roll.data = current_user.roll
         form.rank.data = current_user.rank   
-        
+    
+
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
@@ -334,8 +342,26 @@ def new_post():
 
     new_list.sort(key = lambda new_list: new_list[1])
     app.logger.info(new_list)
+    allocationList = AllocatedSeat.query.filter_by(user_id = current_user.id)
+    allocatedCollege = ""
+    allocatedBranch = ""
+    for x in list:
+
+        for query in join_query.all():
+            if query[1].course_id == allocationList[0].course_id:
+               allocatedCollege = query[0].college_name
+               allocatedBranch = query[2].branch_name
+
+            # for item in query:
+            #     if hasattr(item,'college_name') and x.course_id == 3:
+            #         temp_list.append(item.college_name)
+            # for item in query:
+            #     if hasattr(item,'branch_name') and x.course_id == 3:
+            #         temp_list.append(item.branch_name)
+
+
     return render_template('choices.html', title='New Post',
-                           form=form, legend='Choice Filling',pref = new_list)
+                           form=form, legend='Choice Filling',pref = new_list,allocatedCollege = allocatedCollege,allocatedBranch = allocatedBranch )
 
 
 # @app.route("/post/<int:post_id>")
@@ -375,3 +401,45 @@ def delete_post(post_id):
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('new_post'))
 
+
+
+@app.route('/DeclareResult',methods=['GET','POST']) 
+@adminlogin_required
+def DeclareResult():
+    db.session.query(AllocatedSeat).delete()
+    db.session.commit()
+    allCourse = Course.query.all()
+    course = {}
+    for item in allCourse:
+        course[item.course_id] = item.no_of_seat
+
+    join_query = db.session.query(User,User_preference)\
+                    .join(User,User.id == User_preference.user_id)
+
+    list = []
+
+    for item in join_query:
+        temp = []
+        temp.append(item[0].rank)
+        temp.append(item[1].preference_rank)
+        temp.append(item[0].id)  
+        temp.append(item[1].course_id)
+        list.append(temp)
+
+    list.sort()
+    dict = {}
+    pre_user = -1
+    for item in list:
+        if item[2] != pre_user and course[item[3]]>0:
+            course[item[3]]-=1
+            pre_user = item[2]
+            dict[item[2]] = item[3]
+
+    for item in dict:
+        allocation = AllocatedSeat(user_id = item,course_id = dict[item])
+        db.session.add(allocation)
+        db.session.commit()
+
+    return redirect(url_for('adminhome'))
+
+    

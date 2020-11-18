@@ -175,3 +175,7 @@ class PostForm(FlaskForm):
     
     title2 = SelectField('Choices', validators=[DataRequired()],choices = list)
     submit = SubmitField('Add')
+
+class DeclareResultForm(FlaskForm):
+    submit = SubmitField('Result')
+
