@@ -343,14 +343,17 @@ def new_post():
     new_list.sort(key = lambda new_list: new_list[1])
     app.logger.info(new_list)
     allocationList = AllocatedSeat.query.filter_by(user_id = current_user.id)
-    allocatedCollege = ""
+    allocatedCollege = "Unfortunately You Have Not Been Alloted Any Course."
     allocatedBranch = ""
     for x in list:
 
         for query in join_query.all():
-            if query[1].course_id == allocationList[0].course_id:
-               allocatedCollege = query[0].college_name
-               allocatedBranch = query[2].branch_name
+            try:
+                if query[1].course_id == allocationList[0].course_id:
+                   allocatedCollege = query[0].college_name
+                   allocatedBranch = query[2].branch_name
+            except:
+                allocatedCollege = "Unfortunately You Have Not Been Alloted Any Course."
 
             # for item in query:
             #     if hasattr(item,'college_name') and x.course_id == 3:
