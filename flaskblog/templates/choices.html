@@ -1,21 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
-{% if 1 == 1 %}
+{% if current_time.year>2020 or (current_time.year == 2020 and current_time.month==12 and current_time.day >=5)%}
     <div class="content-section" style="text-align: center;">
         <h2>You Have been Alloted :</h1>
         <h1 style="color: red;text-align: center;">{{allocatedCollege}}</h1>
         <h1 style="color: red;text-align: center;">{{allocatedBranch}}</h1>
     </div>
 {% endif %}
-{% if 1 == 2 %}
+{% if (current_time.year == 2020 and current_time.month==12 and current_time.day <5 and current_time.year == 2020 and current_time.month==12 and current_time.day >=1) or (current_time.year == 2020 and current_time.month==11 and current_time.day > 20 and current_time.year == 2020 and current_time.month==11 and current_time.day <=30 )%}
 
     <div class="content-section">
-        <h2>Choice Filling was Closed on 15 November 2020.</h1>
-        <h2> Result will be declared on 29 November 2020.</h2>
+        <h2>Choice Filling was Closed on 20 November 2020.</h1>
+        <h2> Result will be declared on 5 December 2020.</h2>
     </div>
 
 {% endif %}
-{% if 1 == 1 %}
+{% if current_time.year == 2020 and current_time.month==11 and current_time.day <=20 %}
 <div class="content-section">
     <form method="POST" action="">
         {{ form.hidden_tag() }}

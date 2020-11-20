@@ -8,14 +8,15 @@ from flaskblog.models import User, Post, College, Course, Branch, User_preferenc
 from flask_login import login_user, current_user, logout_user, login_required
 import logging
 from functools import wraps
-from datetime import date
-result_declared = False
+import datetime
+
+adminset = set([1])
 
 def adminlogin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        
-        if current_user.is_authenticated is False or current_user.id != 1:
+
+        if current_user.is_authenticated is False or current_user.id not in adminset:
             flash('Please Log In As Admin','danger')
             return redirect(url_for('Adminlogin'))
         return f(*args, **kwargs)
@@ -51,7 +52,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.id != 1:
+        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.id not in adminset:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
@@ -66,7 +67,8 @@ def Adminlogin():
     form = AdminLoginForm()
     if form.validate_on_submit():
         admin = User.query.filter_by(email=form.email1.data).first()
-        if admin and bcrypt.check_password_hash(admin.password, form.password1.data) and admin.id == 1:
+        
+        if admin and bcrypt.check_password_hash(admin.password, form.password1.data) and admin.id in adminset:
             login_user(admin, remember=form.remember1.data)
             next_page = request.args.get('next')
             app.logger.info(current_user.firstname)
@@ -361,10 +363,12 @@ def new_post():
             # for item in query:
             #     if hasattr(item,'branch_name') and x.course_id == 3:
             #         temp_list.append(item.branch_name)
+    current_time = datetime.datetime.now() 
 
 
     return render_template('choices.html', title='New Post',
-                           form=form, legend='Choice Filling',pref = new_list,allocatedCollege = allocatedCollege,allocatedBranch = allocatedBranch )
+                           form=form, legend='Choice Filling',pref = new_list,
+                           allocatedCollege = allocatedCollege,allocatedBranch = allocatedBranch, current_time = current_time )
 
 
 # @app.route("/post/<int:post_id>")
