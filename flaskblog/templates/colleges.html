@@ -1,6 +1,48 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;font-size: 70px">Seat Matrix</h1>
+
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Search</legend>
+                <div class = "row">
+                <div class="col-md-5">
+                    {{ form.collegename.label(class="form-control-label") }}
+
+                    {% if form.collegename.errors %}
+                        {{ form.collegename(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.collegename.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.collegename(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>  
+                <div class="col-md-5">
+                    {{ form.branchname.label(class="form-control-label") }}
+
+                    {% if form.branchname.errors %}
+                        {{ form.branchname(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.branchname.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.branchname(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>  
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.search(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
     <table class="m-5" style="width: 700px;font-size: 20px" >
         <tr class ="" style="color: black;border: 5px solid #929292;background-color: #FFEE88 ">
                 <th >

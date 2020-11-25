@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AdminLoginForm,CollegeForm,BranchForm,CourseForm,DeclareResultForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AdminLoginForm,CollegeForm,BranchForm,CourseForm,DeclareResultForm,SearchSeatForm
 from flaskblog.models import User, Post, College, Course, Branch, User_preference, Admin, AllocatedSeat
 from flask_login import login_user, current_user, logout_user, login_required
 import logging
@@ -166,7 +166,7 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route("/seat matrix")
+@app.route("/seat matrix",methods=['GET', 'POST'])
 def seat_matrix():
     colleges = College.query.all()
     courses = Course.query.all()
@@ -186,10 +186,25 @@ def seat_matrix():
                 temp.append(item.no_of_seat)
         list.append(temp)
     list.sort()
-    return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list)
+    form = SearchSeatForm()
+    newlist = []
+    if form.validate_on_submit():
+        for item in list:
+            if form.collegename.data and form.branchname.data:
+                if item[0].lower() == form.collegename.data.lower() and item[2].lower() == form.branchname.data.lower():
+                    newlist.append(item)
+            elif form.collegename.data:
+                if item[0].lower() == form.collegename.data.lower():
+                    newlist.append(item)
+            elif form.branchname.data:
+                if item[2].lower() == form.branchname.data.lower():
+                    newlist.append(item)
+        list = newlist
+
+    return render_template('colleges.html', title='collegelist' , courses = courses,join_query = list,form = form)
 
 
-@app.route("/adminseatmatrix")
+@app.route("/adminseatmatrix",methods=['GET', 'POST'])
 @adminlogin_required
 def adminseat_matrix():
     colleges = College.query.all()
@@ -211,8 +226,22 @@ def adminseat_matrix():
         list.append(temp)
     
     list.sort() 
-        
-    return render_template('admincolleges.html', title='collegelist' , courses = courses,join_query = list)
+    form = SearchSeatForm()
+    newlist = []
+    if form.validate_on_submit():
+        for item in list:
+            if form.collegename.data and form.branchname.data:
+                if item[0].lower() == form.collegename.data.lower() and item[2].lower() == form.branchname.data.lower():
+                    newlist.append(item)
+            elif form.collegename.data:
+                if item[0].lower() == form.collegename.data.lower():
+                    newlist.append(item)
+            elif form.branchname.data:
+                if item[2].lower() == form.branchname.data.lower():
+                    newlist.append(item)
+        list = newlist
+
+    return render_template('admincolleges.html', title='collegelist' , courses = courses,join_query = list, form = form)
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)

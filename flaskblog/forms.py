@@ -179,3 +179,9 @@ class PostForm(FlaskForm):
 class DeclareResultForm(FlaskForm):
     submit = SubmitField('Result')
 
+
+class SearchSeatForm(FlaskForm):
+    collegename = StringField('College Name')
+    branchname = StringField('Branch Name')
+    search = SubmitField('Search')
+
